@@ -363,37 +363,38 @@ class StrangerMarker extends Marker {
         return false;
     }
     forceOpponentToBlock() {
-        for (let row = 0; row < this.game.boardSize; row = row + 1) {
-            for (let col = 0; col < this.game.boardSize; col = col + 1) {
+        for (let row = 0; row < this.board.size; row = row + 1) {
+            for (let col = 0; col < this.board.size; col = col + 1) {
                 // Mark the square tentatively ...
-                if (this.game.markSquare(row, col)) {
+                if (this.board.markSquare(row, col)) {
                     // if it creates threat to win ...
-                    if (this.board.gameIsWon(row,col)) {
+                    if (this.board.gameIsWon(row, col)) {
                         // ... figure out how princess would block it
-                        for (let princessRow = 0; princessRow < this.game.boardSize; princessRow++) {
-                            for (let princessCol = 0; princessCol < this.game.boardSize; princessCol = princessCol + 1) {
+                        for (let princessRow = 0; princessRow < this.board.size; princessRow++) {
+                            for (let princessCol = 0; princessCol < this.board.size; princessCol = princessCol + 1) {
                                 // Mark the square tentatively for opponent ...
-                                if (this.game.markSquare(princessRow, princessCol, true)) {
+                                if (this.board.markSquare(princessRow, princessCol, true)) {
                                     // if this is the block, and it creates no fork ...
-                                    if ( this.findWinningMove(true) && this.findForkingMove(true)) {
+                                    if (this.findWinningMove(true) && this.findForkingMove(true)) {
                                         // ... unmark the princess block and play here.
-                                        this.game.unmarkSquare(princessRow, princessCol);
+                                        this.board.unmarkSquare(princessRow, princessCol);
                                         this.playInSquare(row, col);
                                         return true;
                                     }
                                     // unmark tentative princess square
-                                    this.game.unmarkSquare(princessRow, princessCol);
+                                    this.board.unmarkSquare(princessRow, princessCol);
                                 }
                             }
                         }
                     }
                     // unmark tentative stranger move
-                    this.game.unmarkSquare(row, col);
+                    this.board.unmarkSquare(row, col);
                 }
             }
+
+            // no move found
+            return false;
         }
-        // no move found
-        return false;
     }
 
     findForkingMove(forOpponent) {
@@ -403,7 +404,7 @@ class StrangerMarker extends Marker {
                     if (this.board.countingWinningMoves(forOpponent)) {
                         if (forOpponent) {
                             // ... remove the tentative mark ...
-                            this.game.unmarkSquare(row, col);
+                            this.board.unmarkSquare(row, col);
                             // ... and try to force opponent to block.
                             if (this.forceOpponentToBlock()) {
                                 return true;
